@@ -1,23 +1,23 @@
-# from where i should start
-#use an official image of NOde.js runtime
-FROM node:24.14.0-alpine
+#-----Stage 1----Build stage
+FROM node:24.14.0-alpine AS builder
 
-#set the working directory inside the container
-#current directory is /app 
-WORKDIR  /app
+WORKDIR /app
 
-#copy all package.json files in working directory
 COPY package*.json ./
 
-#install dependencies
-RUN npm install
+RUN npm install 
 
-#copy all the file into currenctly container working directory
-#its also bring node module file-> learn it to not
 COPY . .
 
-ENV PORT=3000
+#---- Start 2--- Production Stage
+FROM node:24.14.0-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app /app
 
 EXPOSE 3000
 
-CMD ["npm" , "start"]
+ENV PORT=3000
+
+CMD ["node" ,"index.js"]
